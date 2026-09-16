@@ -1,0 +1,158 @@
+name: Build AVNC TV
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout helper repo
+        uses: actions/checkout@v4
+
+      - name: Clone AVNC 3.3.1
+        run: |
+          git clone --branch v3.3.1 --depth 1 --recurse-submodules https://github.com/gujjwal00/avnc.git avnc
+
+      - name: Apply Android TV patch
+        run: |
+          base64 -d > /tmp/patch_avnc_tv.py <<'B64'
+          IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwpmcm9tIHBhdGhsaWIgaW1wb3J0IFBhdGgKCnJvb3QgPSBQ
+          YXRoKCdhdm5jJykKCmRlZiBsb2FkKHJlbCk6CiAgICBwID0gcm9vdCAvIHJlbAogICAgcmV0dXJu
+          IHAsIHAucmVhZF90ZXh0KGVuY29kaW5nPSd1dGYtOCcpCgpkZWYgc2F2ZShwLCBzKToKICAgIHAu
+          d3JpdGVfdGV4dChzLCBlbmNvZGluZz0ndXRmLTgnKQoKZGVmIHJlcChzLCBvbGQsIG5ldywgbGFi
+          ZWwpOgogICAgaWYgb2xkIG5vdCBpbiBzOgogICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoZidNaXNz
+          aW5nIHBhdGNoIGFuY2hvcjoge2xhYmVsfScpCiAgICByZXR1cm4gcy5yZXBsYWNlKG9sZCwgbmV3
+          LCAxKQoKcCwgcyA9IGxvYWQoJ2FwcC9zcmMvbWFpbi9qYXZhL2NvbS9nYXVyYXYvYXZuYy91aS92
+          bmMvVm5jQWN0aXZpdHkua3QnKQpzID0gcmVwKAogICAgcywKICAgICcgICAgcHJpdmF0ZSB2YXIg
+          YXV0b1JlY29ubmVjdERlbGF5ID0gNVxuJywKICAgICcgICAgcHJpdmF0ZSB2YXIgYXV0b1JlY29u
+          bmVjdERlbGF5ID0gNVxuJwogICAgJyAgICBwcml2YXRlIHZhciB0dkdlc3R1cmVNb2RlID0gZmFs
+          c2VcbicKICAgICcgICAgcHJpdmF0ZSB2YXIgdHZPa0xvbmdQcmVzcyA9IGZhbHNlXG4nLAogICAg
+          J1ZuY0FjdGl2aXR5IGZpZWxkcycKKQpzID0gcmVwKAogICAgcywKICAgICcgICAgICAgIGlmIChp
+          c0Nvbm5lY3RlZCkge1xuICAgICAgICAgICAgc2hvd1ZpZXdlckhlbHAoKVxuJywKICAgICcgICAg
+          ICAgIGlmIChpc0Nvbm5lY3RlZCkge1xuJwogICAgJyAgICAgICAgICAgIC8vIEFuZHJvaWQgVFY6
+          IHNraXAgdGhlIHRvdWNoLW9ubHkgZmlyc3QtcnVuIHR1dG9yaWFsLlxuJwogICAgJyAgICAgICAg
+          ICAgIHZpZXdNb2RlbC5wcmVmLnJ1bkluZm8uaGFzU2hvd25WaWV3ZXJIZWxwID0gdHJ1ZVxuJywK
+          ICAgICdza2lwIHZpZXdlciBoZWxwJwopCm1hcmtlciA9ICcgICAgLyoqKioqKioqKioqKioqKioq
+          KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+          KioqKioqKioqKioqKioqKioqKipcbiAgICAgKiBTZXNzaW9uIHN0YXJ0dXBcbicKbWV0aG9kID0g
+          JycnICAgIC8qKiBBbmRyb2lkIFRWIHJlbW90ZSBjb250cm9sIG1vZGUuCiAgICAgKiBELXBhZDog
+          bW92ZSByZW1vdGUgcG9pbnRlci4KICAgICAqIE9LL0VudGVyOiBsZWZ0IGNsaWNrLgogICAgICog
+          TG9uZy1wcmVzcyBPSzogdG9nZ2xlIGdlc3R1cmUgcHJlc2V0IG1vZGUuCiAgICAgKiBHZXN0dXJl
+          IG1vZGU6IEQtcGFkIHNlbmRzIHN3aXBlL3Njcm9sbCBwcmVzZXRzIHRvIFRyb2xsVk5DLgogICAg
+          ICovCiAgICBvdmVycmlkZSBmdW4gZGlzcGF0Y2hLZXlFdmVudChldmVudDogS2V5RXZlbnQpOiBC
+          b29sZWFuIHsKICAgICAgICBpZiAodmlld01vZGVsLmNvbm5lY3RlZCkgewogICAgICAgICAgICB2
+          YWwgaXNEb3duID0gZXZlbnQuYWN0aW9uID09IEtleUV2ZW50LkFDVElPTl9ET1dOCiAgICAgICAg
+          ICAgIHdoZW4gKGV2ZW50LmtleUNvZGUpIHsKICAgICAgICAgICAgICAgIEtleUV2ZW50LktFWUNP
+          REVfRFBBRF9VUCwKICAgICAgICAgICAgICAgIEtleUV2ZW50LktFWUNPREVfRFBBRF9ET1dOLAog
+          ICAgICAgICAgICAgICAgS2V5RXZlbnQuS0VZQ09ERV9EUEFEX0xFRlQsCiAgICAgICAgICAgICAg
+          ICBLZXlFdmVudC5LRVlDT0RFX0RQQURfUklHSFQgLT4gewogICAgICAgICAgICAgICAgICAgIGlm
+          IChpc0Rvd24pIHsKICAgICAgICAgICAgICAgICAgICAgICAgaWYgKHR2R2VzdHVyZU1vZGUpIHsK
+          ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdoZW4gKGV2ZW50LmtleUNvZGUpIHsKICAgICAg
+          ICAgICAgICAgICAgICAgICAgICAgICAgICBLZXlFdmVudC5LRVlDT0RFX0RQQURfVVAgLT4gaW5w
+          dXRIYW5kbGVyLm9uVHZTd2lwZSgwZiwgMTIwZikKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+          ICAgICBLZXlFdmVudC5LRVlDT0RFX0RQQURfRE9XTiAtPiBpbnB1dEhhbmRsZXIub25UdlN3aXBl
+          KDBmLCAtMTIwZikKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBLZXlFdmVudC5LRVlD
+          T0RFX0RQQURfTEVGVCAtPiBpbnB1dEhhbmRsZXIub25UdlN3aXBlKDEyMGYsIDBmKQogICAgICAg
+          ICAgICAgICAgICAgICAgICAgICAgICAgIEtleUV2ZW50LktFWUNPREVfRFBBRF9SSUdIVCAtPiBp
+          bnB1dEhhbmRsZXIub25UdlN3aXBlKC0xMjBmLCAwZikKICAgICAgICAgICAgICAgICAgICAgICAg
+          ICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgICAgICAg
+          ICAgICAgICAgIHdoZW4gKGV2ZW50LmtleUNvZGUpIHsKICAgICAgICAgICAgICAgICAgICAgICAg
+          ICAgICAgICBLZXlFdmVudC5LRVlDT0RFX0RQQURfVVAgLT4gaW5wdXRIYW5kbGVyLm9uVHZNb3Zl
+          KDBmLCAtMzZmKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEtleUV2ZW50LktFWUNP
+          REVfRFBBRF9ET1dOIC0+IGlucHV0SGFuZGxlci5vblR2TW92ZSgwZiwgMzZmKQogICAgICAgICAg
+          ICAgICAgICAgICAgICAgICAgICAgIEtleUV2ZW50LktFWUNPREVfRFBBRF9MRUZUIC0+IGlucHV0
+          SGFuZGxlci5vblR2TW92ZSgtMzZmLCAwZikKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+          ICBLZXlFdmVudC5LRVlDT0RFX0RQQURfUklHSFQgLT4gaW5wdXRIYW5kbGVyLm9uVHZNb3ZlKDM2
+          ZiwgMGYpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAg
+          ICAgIH0KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHRy
+          dWUKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBLZXlFdmVudC5LRVlDT0RFX0RQ
+          QURfQ0VOVEVSLAogICAgICAgICAgICAgICAgS2V5RXZlbnQuS0VZQ09ERV9FTlRFUiwKICAgICAg
+          ICAgICAgICAgIEtleUV2ZW50LktFWUNPREVfTlVNUEFEX0VOVEVSIC0+IHsKICAgICAgICAgICAg
+          ICAgICAgICBpZiAoaXNEb3duICYmIGV2ZW50LnJlcGVhdENvdW50ID49IDEgJiYgIXR2T2tMb25n
+          UHJlc3MpIHsKICAgICAgICAgICAgICAgICAgICAgICAgdHZPa0xvbmdQcmVzcyA9IHRydWUKICAg
+          ICAgICAgICAgICAgICAgICAgICAgdHZHZXN0dXJlTW9kZSA9ICF0dkdlc3R1cmVNb2RlCiAgICAg
+          ICAgICAgICAgICAgICAgICAgIFRvYXN0Lm1ha2VUZXh0KAogICAgICAgICAgICAgICAgICAgICAg
+          ICAgICAgdGhpcywKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmICh0dkdlc3R1cmVNb2Rl
+          KSAi5omL5Yq/5qih5byP77ya5pa55ZCR6ZSuPea7keWKqCIgZWxzZSAi5YWJ5qCH5qih5byP77ya
+          5pa55ZCR6ZSuPeenu+WKqCIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBUb2FzdC5MRU5H
+          VEhfU0hPUlQKICAgICAgICAgICAgICAgICAgICAgICAgKS5zaG93KCkKICAgICAgICAgICAgICAg
+          ICAgICAgICAgcmV0dXJuIHRydWUKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAg
+          ICAgICAgaWYgKGV2ZW50LmFjdGlvbiA9PSBLZXlFdmVudC5BQ1RJT05fVVApIHsKICAgICAgICAg
+          ICAgICAgICAgICAgICAgaWYgKHR2T2tMb25nUHJlc3MpIHsKICAgICAgICAgICAgICAgICAgICAg
+          ICAgICAgIHR2T2tMb25nUHJlc3MgPSBmYWxzZQogICAgICAgICAgICAgICAgICAgICAgICB9IGVs
+          c2UgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRIYW5kbGVyLm9uVHZDbGljaygp
+          CiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJu
+          IHRydWUKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHRy
+          dWUKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICByZXR1
+          cm4gc3VwZXIuZGlzcGF0Y2hLZXlFdmVudChldmVudCkKICAgIH0KCicnJwppZiBtYXJrZXIgbm90
+          IGluIHM6CiAgICByYWlzZSBTeXN0ZW1FeGl0KCdNaXNzaW5nIHBhdGNoIGFuY2hvcjogVm5jQWN0
+          aXZpdHkgc2Vzc2lvbiBtYXJrZXInKQpzID0gcy5yZXBsYWNlKG1hcmtlciwgbWV0aG9kICsgbWFy
+          a2VyLCAxKQpzYXZlKHAsIHMpCgpwLCBzID0gbG9hZCgnYXBwL3NyYy9tYWluL2phdmEvY29tL2dh
+          dXJhdi9hdm5jL3VpL3ZuYy9pbnB1dC9JbnB1dEhhbmRsZXIua3QnKQptYXJrZXIgPSAnICAgIC8q
+          KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+          KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovXG4nCmFkZCA9ICcnJyAgICAvLyBB
+          bmRyb2lkIFRWIGhlbHBlcnMgdXNlZCBieSBWbmNBY3Rpdml0eSdzIEQtcGFkIGFkYXB0ZXIuCiAg
+          ICBmdW4gb25Udk1vdmUoZHg6IEZsb2F0LCBkeTogRmxvYXQpOiBCb29sZWFuIHsKICAgICAgICB2
+          YWwgZCA9IGRpc3BhdGNoZXIgPzogcmV0dXJuIGZhbHNlCiAgICAgICAgZC5vblR2TW92ZShkeCwg
+          ZHkpCiAgICAgICAgcmV0dXJuIHRydWUKICAgIH0KCiAgICBmdW4gb25UdkNsaWNrKCk6IEJvb2xl
+          YW4gewogICAgICAgIHZhbCBkID0gZGlzcGF0Y2hlciA/OiByZXR1cm4gZmFsc2UKICAgICAgICBk
+          Lm9uVHZDbGljaygpCiAgICAgICAgcmV0dXJuIHRydWUKICAgIH0KCiAgICBmdW4gb25UdlN3aXBl
+          KGR4OiBGbG9hdCwgZHk6IEZsb2F0KTogQm9vbGVhbiB7CiAgICAgICAgdmFsIGQgPSBkaXNwYXRj
+          aGVyID86IHJldHVybiBmYWxzZQogICAgICAgIGQub25UdlN3aXBlKGR4LCBkeSkKICAgICAgICBy
+          ZXR1cm4gdHJ1ZQogICAgfQoKJycnCmlmIG1hcmtlciBub3QgaW4gczoKICAgIHJhaXNlIFN5c3Rl
+          bUV4aXQoJ01pc3NpbmcgcGF0Y2ggYW5jaG9yOiBJbnB1dEhhbmRsZXIgbWFya2VyJykKcyA9IHMu
+          cmVwbGFjZShtYXJrZXIsIGFkZCArIG1hcmtlciwgMSkKc2F2ZShwLCBzKQoKcCwgcyA9IGxvYWQo
+          J2FwcC9zcmMvbWFpbi9qYXZhL2NvbS9nYXVyYXYvYXZuYy91aS92bmMvaW5wdXQvRGlzcGF0Y2hl
+          ci5rdCcpCm1hcmtlciA9ICcgICAgZnVuIG9uU3R5bHVzVGFwKHA6IFBvaW50RikgPSBkaXJlY3RN
+          b2RlLmRvQ2xpY2soUG9pbnRlckJ1dHRvbi5MZWZ0LCBwKVxuJwphZGQgPSAnJycgICAgLy8gQW5k
+          cm9pZCBUViBELXBhZCBhZGFwdGVyLiBSZS1zeW5jIHJlbGF0aXZlIHBvaW50ZXIgcG9zaXRpb24g
+          Zm9yIGV2ZXJ5IGtleSBldmVudC4KICAgIGZ1biBvblR2TW92ZShkeDogRmxvYXQsIGR5OiBGbG9h
+          dCkgewogICAgICAgIHJlbGF0aXZlTW9kZS5vbkdlc3R1cmVTdGFydCgpCiAgICAgICAgcmVsYXRp
+          dmVNb2RlLmRvTW92ZVBvaW50ZXIoZHgsIGR5LCBmYWxzZSkKICAgICAgICByZWxhdGl2ZU1vZGUu
+          b25HZXN0dXJlU3RvcChQb2ludEYoKSkKICAgIH0KCiAgICBmdW4gb25UdkNsaWNrKCkgewogICAg
+          ICAgIHJlbGF0aXZlTW9kZS5vbkdlc3R1cmVTdGFydCgpCiAgICAgICAgcmVsYXRpdmVNb2RlLmRv
+          Q2xpY2soUG9pbnRlckJ1dHRvbi5MZWZ0LCBQb2ludEYoKSkKICAgICAgICByZWxhdGl2ZU1vZGUu
+          b25HZXN0dXJlU3RvcChQb2ludEYoKSkKICAgIH0KCiAgICBmdW4gb25UdlN3aXBlKGR4OiBGbG9h
+          dCwgZHk6IEZsb2F0KSB7CiAgICAgICAgcmVsYXRpdmVNb2RlLm9uR2VzdHVyZVN0YXJ0KCkKICAg
+          ICAgICByZWxhdGl2ZU1vZGUuZG9SZW1vdGVTY3JvbGwoUG9pbnRGKCksIGR4LCBkeSkKICAgICAg
+          ICByZWxhdGl2ZU1vZGUub25HZXN0dXJlU3RvcChQb2ludEYoKSkKICAgIH0KCicnJwppZiBtYXJr
+          ZXIgbm90IGluIHM6CiAgICByYWlzZSBTeXN0ZW1FeGl0KCdNaXNzaW5nIHBhdGNoIGFuY2hvcjog
+          RGlzcGF0Y2hlciBzdHlsdXMgbWFya2VyJykKcyA9IHMucmVwbGFjZShtYXJrZXIsIGFkZCArIG1h
+          cmtlciwgMSkKc2F2ZShwLCBzKQoKcCwgcyA9IGxvYWQoJ2FwcC9zcmMvbWFpbi9yZXMvdmFsdWVz
+          L3N0cmluZ3MueG1sJykKcyA9IHJlcCgKICAgIHMsCiAgICAnPHN0cmluZyBuYW1lPSJhcHBfbmFt
+          ZSIgdHJhbnNsYXRhYmxlPSJmYWxzZSI+QVZOQzwvc3RyaW5nPicsCiAgICAnPHN0cmluZyBuYW1l
+          PSJhcHBfbmFtZSIgdHJhbnNsYXRhYmxlPSJmYWxzZSI+QVZOQyBUVjwvc3RyaW5nPicsCiAgICAn
+          YXBwIG5hbWUnCikKc2F2ZShwLCBzKQpwcmludCgnQVZOQyBUViBwYXRjaCBhcHBsaWVkJykK
+          B64
+          python3 /tmp/patch_avnc_tv.py
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: avnc/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Install Android SDK pieces
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "ndk;28.2.13676358" \
+            "cmake;3.22.1"
+
+      - name: Build debug APK
+        working-directory: avnc
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload AVNC TV APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AVNC-TV
+          path: avnc/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
